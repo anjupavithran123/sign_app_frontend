@@ -16,7 +16,7 @@ const SIGNATURE_FONTS = [
 // Ink colors
 const COLORS = ["#000000", "#ef4444", "#3b82f6", "#22c55e"];
 
-export default function SignaturePanel({ fileId, setDragItem }) {
+export default function SignaturePanel({ fileId, setDragItem, hideSignButton = false,  }) {
   const { user } = useAuth(); // get current logged-in user
   const signerId = user?.id;
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -191,12 +191,15 @@ export default function SignaturePanel({ fileId, setDragItem }) {
 />
         </div>
 
-        <button
-          onClick={handleSign}
-          className="w-full bg-[#ff5a1f] text-white py-4 rounded-xl font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all mt-4"
-        >
-          Sign ➔
-        </button>
+        {!hideSignButton && (
+  <button
+    onClick={handleSign}
+    className="w-full bg-[#ff5a1f] text-white py-4 rounded-xl font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all mt-4"
+  >
+    Sign ➔
+  </button>
+)}
+
       </div>
 
       {showModal && (

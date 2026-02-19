@@ -46,7 +46,17 @@ export default function PublicSignPage() {
 
     fetchSignature();
   }, [token]);
-
+  const handleDownload = () => {
+    if (!pdfUrl) return;
+  
+    const link = document.createElement("a");
+    link.href = pdfUrl;
+    link.download = "signed-document.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   // Drop handler (supports stamp base64)
   const handleDrop = (e) => {
     e.preventDefault();
@@ -130,16 +140,18 @@ export default function PublicSignPage() {
 
   return (
    
-      <div className="flex justify-center bg-gray-100 min-h-screen">
+<div className="flex h-screen bg-gray-100 overflow-hidden">
+
     
           {/* PDF Viewer */}
-          <div
-            className="relative bg-white shadow-lg"
-            style={{ width: 800 }}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-          >
-    
+          <div className="flex-1 flex justify-center overflow-y-auto p-6">
+  <div
+    className="relative bg-white shadow-lg"
+    style={{ width: 800 }}
+    onDragOver={(e) => e.preventDefault()}
+    onDrop={handleDrop}
+  >
+
         <Document file={pdfUrl}>
           <Page pageNumber={1} width={800} />
         </Document>
@@ -222,14 +234,15 @@ export default function PublicSignPage() {
           </Rnd>
         ))}
       </div>
-
+</div>
       {/* Sidebar */}
-      <div className="border-l bg-white">
-    <SignaturePanel
-      fileId={signatureData?.file_id}
-      setDragItem={setDragItem}
-    />
-  </div>
+      <SignaturePanel
+  fileId={signatureData?.file_id}
+  setDragItem={setDragItem}
+  hideSignButton={true}
+/>
+
+ 
 
       {/* Buttons */}
       {!signed && (
