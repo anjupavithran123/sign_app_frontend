@@ -1,0 +1,21 @@
+/* ALL 16 FONTS MUST BE IN THIS URL */
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Arizonia&family=Bad+Script&family=Caveat&family=Cookie&family=Dancing+Script&family=Great+Vibes&family=Homemade+Apple&family=Marck+Script&family=Pacifico&family=Parisienne&family=Pinyon+Script&family=Reenie+Beanie&family=Satisfy&family=Yellowtail&display=swap');
+
+@import "tailwindcss";
+
+.font-dancing { font-family: 'Dancing Script', cursive; }
+.font-vibes { font-family: 'Great Vibes', cursive; }
+.font-pacifico { font-family: 'Pacifico', cursive; }
+.font-yellowtail { font-family: 'Yellowtail', cursive; }
+.font-satisfy { font-family: 'Satisfy', cursive; }
+.font-alex { font-family: 'Alex Brush', cursive; }
+.font-cookie { font-family: 'Cookie', cursive; }
+.font-parisienne { font-family: 'Parisienne', cursive; }
+.font-allura { font-family: 'Allura', cursive; }
+.font-pinyon { font-family: 'Pinyon Script', cursive; }
+.font-marck { font-family: 'Marck Script', cursive; }
+.font-apple { font-family: 'Homemade Apple', cursive; }
+.font-arizonia { font-family: 'Arizonia', cursive; }
+.font-caveat { font-family: 'Caveat', cursive; }
+.font-badscript { font-family: 'Bad Script', cursive; }
+.font-reenie { font-family: 'Reenie Beanie', cursive; }

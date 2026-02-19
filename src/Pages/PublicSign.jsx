@@ -1,0 +1,263 @@
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { Document, Page, pdfjs } from "react-pdf";
+import { Rnd } from "react-rnd";
+import SignaturePanel from "../Components/SignaturePanel";
+import api from "../api/axios";
+
+pdfjs.GlobalWorkerOptions.workerSrc =
+  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
+export default function PublicSignPage() {
+  const { token } = useParams();
+
+  const [signatureData, setSignatureData] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [elements, setElements] = useState([]);
+  const [dragItem, setDragItem] = useState(null);
+  const [signed, setSigned] = useState(false);
+  const [error, setError] = useState(null);
+  const elementRefs = useRef({});
+
+  // Fetch signature info
+  useEffect(() => {
+    const fetchSignature = async () => {
+      try {
+        const res = await api.get(`/api/signatures/public/${token}`);
+        const signature = res.data.signature;
+
+        if (!signature) throw new Error("Invalid response");
+
+        setSignatureData(signature);
+
+        const url =
+          signature.documents?.signed_url ||
+          signature.documents?.file_url ||
+          null;
+
+        setPdfUrl(url);
+        setElements(signature.elements || []);
+        setSigned(signature.status === "signed");
+      } catch (err) {
+        console.error(err);
+        setError("Invalid or expired link ❌");
+      }
+    };
+
+    fetchSignature();
+  }, [token]);
+
+  // Drop handler (supports stamp base64)
+  const handleDrop = (e) => {
+    e.preventDefault();
+    if (!dragItem) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // STAMP (convert file to base64)
+    if (dragItem.type === "stamp" && dragItem.file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        setElements((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            x,
+            y,
+            width: 150,
+            height: 50,
+            type: "stamp",
+            value: reader.result,
+          },
+        ]);
+      };
+
+      reader.readAsDataURL(dragItem.file);
+    } else {
+      setElements((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          x,
+          y,
+          width: 150,
+          height: 50,
+          ...dragItem,
+        },
+      ]);
+    }
+
+    setDragItem(null);
+  };
+
+  // SIGN
+  const handleSign = async () => {
+    try {
+      await api.patch(
+        `/api/signatures/public/${signatureData.token.trim()}/status`,
+        { action: "sign", elements }
+      );
+
+      setSigned(true);
+      alert("Document signed ✅");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to sign ❌");
+    }
+  };
+
+  // REJECT
+  const handleReject = async (reason) => {
+    try {
+      await api.patch(
+        `/api/signatures/public/${signatureData.token.trim()}/status`,
+        { action: "reject", reason }
+      );
+
+      setSigned(true);
+      alert("Document rejected ✅");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to reject ❌");
+    }
+  };
+
+  if (error) return <p className="text-red-600">{error}</p>;
+  if (!pdfUrl) return <p>Loading...</p>;
+
+  return (
+   
+      <div className="flex justify-center bg-gray-100 min-h-screen">
+    
+          {/* PDF Viewer */}
+          <div
+            className="relative bg-white shadow-lg"
+            style={{ width: 800 }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+    
+        <Document file={pdfUrl}>
+          <Page pageNumber={1} width={800} />
+        </Document>
+
+        {/* Render Elements */}
+        {elements.map((el) => (
+          <Rnd
+            key={el.id}
+            size={{
+              width: el.width ?? 150,
+              height: el.height ?? 50,
+            }}
+            position={{
+              x: el.x ?? 0,
+              y: el.y ?? 0,
+            }}
+            bounds="parent"
+            onDragStop={(e, d) => {
+              setElements((prev) =>
+                prev.map((item) =>
+                  item.id === el.id
+                    ? { ...item, x: d.x, y: d.y }
+                    : item
+                )
+              );
+            }}
+            onResizeStop={(e, direction, ref, delta, position) => {
+              setElements((prev) =>
+                prev.map((item) =>
+                  item.id === el.id
+                    ? {
+                        ...item,
+                        width: ref.offsetWidth,
+                        height: ref.offsetHeight,
+                        x: position.x,
+                        y: position.y,
+                      }
+                    : item
+                )
+              );
+            }}
+          >
+            <div className="w-full h-full flex items-center justify-center">
+              
+              {/* SIGNATURE */}
+              {el.type === "signature" && (
+                <div
+                  className={el.font}
+                  style={{
+                    color: el.color || "#000",
+                    fontSize: el.height * 0.6,
+                    lineHeight: 1,
+                  }}
+                >
+                  {el.value}
+                </div>
+              )}
+
+              {/* STAMP */}
+              {el.type === "stamp" && el.value && (
+                <img
+                  src={el.value}
+                  alt="Stamp"
+                  className="w-full h-full object-contain pointer-events-none"
+                />
+              )}
+
+              {/* DATE */}
+              {el.type === "date" && (
+                <div
+                  style={{
+                    fontSize: el.height * 0.4,
+                    color: "#6b21a8",
+                  }}
+                >
+                  {new Date().toLocaleDateString()}
+                </div>
+              )}
+            </div>
+          </Rnd>
+        ))}
+      </div>
+
+      {/* Sidebar */}
+      <div className="border-l bg-white">
+    <SignaturePanel
+      fileId={signatureData?.file_id}
+      setDragItem={setDragItem}
+    />
+  </div>
+
+      {/* Buttons */}
+      {!signed && (
+        <div className="fixed bottom-10 right-10 flex gap-4">
+          <button
+            onClick={handleSign}
+            className="bg-orange-600 text-white px-6 py-3 rounded-xl shadow-lg hover:brightness-110"
+          >
+            Sign Document ➔
+          </button>
+
+          <button
+            onClick={() => {
+              const reason = prompt("Reason for rejection:");
+              if (reason) handleReject(reason);
+            }}
+            className="bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg hover:brightness-110"
+          >
+            Reject ❌
+          </button>
+        </div>
+      )}
+
+      {signed && (
+        <div className="fixed bottom-10 right-10 text-green-600 font-bold text-xl">
+          Document processed ✅
+        </div>
+      )}
+    </div>
+  );
+}
