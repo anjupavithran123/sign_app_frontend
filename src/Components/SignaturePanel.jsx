@@ -86,8 +86,8 @@ export default function SignaturePanel({ fileId, setDragItem, hideSignButton = f
   
 
   return (
-    <div className="h-screen flex bg-[#f3f3f3] font-sans">
-      {/* DOCUMENT PREVIEW */}
+<div className="h-screen flex bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        {/* DOCUMENT PREVIEW */}
       {/* <div className="flex-1 flex justify-center p-8 overflow-auto border-r border-gray-200">
         <div className="bg-white shadow-lg w-[550px] h-[750px] relative p-12">
           <div
@@ -102,11 +102,12 @@ export default function SignaturePanel({ fileId, setDragItem, hideSignButton = f
       {/* SIDEBAR */}
       <div className="w-80 bg-white flex flex-col p-4 shadow-xl">
       <button
-          onClick={() => setShowInviteModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Invite Signers
-        </button>
+    onClick={() => setShowInviteModal(true)}
+    className="w-full bg-[#4f46e5] text-white py-2.5 rounded-lg text-sm font-semibold shadow-sm hover:bg-[#4338ca] transition"
+  >
+    Invite Signers
+  </button>
+
 
         {showInviteModal && (
           <InviteSignersModal
@@ -137,11 +138,11 @@ export default function SignaturePanel({ fileId, setDragItem, hideSignButton = f
           <span className="text-blue-400 text-lg">✎</span>
         </div>
 
-        <h3 className="text-[11px] font-bold text-gray-400 uppercase mb-3 tracking-wider">
+        <h3 className="text-[11px] font-bold text-gray-400 uppercase mb-1 tracking-wider">
           Optional fields
         </h3>
-        <div className="space-y-2 flex-1">
-        <SidebarField
+        <div className="space-y-1">
+  <SidebarField
   icon="👤"
   label="Name"
   value={signatureData.fullName}
@@ -194,7 +195,7 @@ export default function SignaturePanel({ fileId, setDragItem, hideSignButton = f
         {!hideSignButton && (
   <button
     onClick={handleSign}
-    className="w-full bg-[#ff5a1f] text-white py-4 rounded-xl font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all mt-4"
+    className="w-full bg-[#ff5a1f] text-white py-2 rounded-xl font-bold shadow-lg hover:brightness-110 active:scale-95 transition-all mt-2"
   >
     Sign ➔
   </button>

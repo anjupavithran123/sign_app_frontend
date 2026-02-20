@@ -10,6 +10,8 @@ pdfjs.GlobalWorkerOptions.workerSrc =
 
 export default function PublicSignPage() {
   const { token } = useParams();
+  const [showRejectCard, setShowRejectCard] = useState(false);
+const [rejectReason, setRejectReason] = useState("");
 
   const [signatureData, setSignatureData] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -242,30 +244,68 @@ export default function PublicSignPage() {
   hideSignButton={true}
 />
 
- 
+ {/* Action Buttons */}
+{!signed && !showRejectCard && (
+  <div className="fixed bottom-10 right-10 flex gap-4">
 
-      {/* Buttons */}
-      {!signed && (
-        <div className="fixed bottom-10 right-10 flex gap-4">
-          <button
-            onClick={handleSign}
-            className="bg-orange-600 text-white px-6 py-3 rounded-xl shadow-lg hover:brightness-110"
-          >
-            Sign Document ➔
-          </button>
+    {/* Sign Button */}
+    <button
+      onClick={handleSign}
+      className="bg-orange-600 text-white px-8 py-4 text-lg rounded-2xl shadow-xl hover:brightness-110 transition"
+    >
+      Sign Document ➔
+    </button>
 
-          <button
-            onClick={() => {
-              const reason = prompt("Reason for rejection:");
-              if (reason) handleReject(reason);
-            }}
-            className="bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg hover:brightness-110"
-          >
-            Reject ❌
-          </button>
-        </div>
-      )}
+    {/* Reject Button */}
+    <button
+      onClick={() => setShowRejectCard(true)}
+      className="bg-red-600 text-white px-8 py-4 text-lg rounded-2xl shadow-xl hover:brightness-110 transition"
+    >
+      Reject ❌
+    </button>
 
+  </div>
+)}
+{/* Reject Card */}
+{!signed && showRejectCard && (
+  <div className="fixed bottom-10 right-10 w-80 bg-white rounded-xl shadow-2xl p-5 border border-gray-200">
+
+    <h3 className="text-sm font-semibold mb-3 text-gray-700">
+      Reason for Rejection
+    </h3>
+
+    <textarea
+      value={rejectReason}
+      onChange={(e) => setRejectReason(e.target.value)}
+      placeholder="Enter rejection reason..."
+      className="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-red-400"
+      rows={3}
+    />
+
+    <div className="flex justify-end gap-3 mt-4">
+      <button
+        onClick={() => {
+          setShowRejectCard(false);
+          setRejectReason("");
+        }}
+        className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100"
+      >
+        Cancel
+      </button>
+
+      <button
+        onClick={() => {
+          if (!rejectReason.trim()) return alert("Please enter a reason");
+          handleReject(rejectReason);
+        }}
+        className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
+      >
+        Confirm Reject
+      </button>
+    </div>
+
+  </div>
+)}
       {signed && (
         <div className="fixed bottom-10 right-10 text-green-600 font-bold text-xl">
           Document processed ✅

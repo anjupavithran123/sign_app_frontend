@@ -236,164 +236,167 @@ const handleCopy = async () => {
   if (!url) return <p>Loading...</p>;
 
   return (
-    <div className="flex-1 flex flex-col items-center p-6 bg-gray-100">
-
-      {/* Top Action Bar */}
-      <div className="w-[800px] flex justify-between mb-4">
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-        >
-          <Save size={18} />
-          {loading ? "Saving..." : "Save"}
-        </button>
-        <button
-    onClick={handleUpload}
-    className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-  >
-    <CloudUpload size={18} />
-
-  </button>
-  {signedUrl && (
-  <button
-    onClick={handleCopy}
-    className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition"
-  >
-    {copied ? <FiCheck size={18} /> : <FiCopy size={18} />}
-  </button>
-)}
-
-        <button
-          onClick={handleDownload}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
-        >
-          <Download size={18} />
-          
-        </button>
-      </div>
-
-      {/* PDF Container */}
-      <div
-        className="relative bg-white shadow-lg"
-        style={{ width: 800 }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        <Document file={url}>
-          <Page pageNumber={1} width={800} />
-        </Document>
-
-        {/* Render Elements */}
-        {elements.map((el, index) => (
-        <Rnd
-        key={el.id}
-        onMouseDown={() => setSelectedId(el.id)}
-        size={{
-          width: el.width ?? 150,
-          height: el.height ?? 50,
-        }}
-        position={{
-          x: el.x ?? 0,
-          y: el.y ?? 0,
-        }}
-        bounds="parent"
-        enableResizing={selectedId === el.id}   // ✅ only resize when selected
-        onDragStop={(e, d) => {
-          setElements((prev) =>
-            prev.map((item) =>
-              item.id === el.id
-                ? { ...item, x: d.x, y: d.y }
-                : item
-            )
-          );
-        }}
-        onResizeStop={(e, direction, ref, delta, position) => {
-          setElements((prev) =>
-            prev.map((item) =>
-              item.id === el.id
-                ? {
-                    ...item,
-                    width: ref.offsetWidth,
-                    height: ref.offsetHeight,
-                    x: position.x,
-                    y: position.y,
-                  }
-                : item
-            )
-          );
-        }}
-      >
-        <div
-          ref={(ref) => (elementRefs.current[el.id] = ref)}
-          className={`w-full h-full flex items-center justify-center cursor-move
-            ${selectedId === el.id ? "border-2 border-blue-500" : ""}`}
-        >
-          {/* Signature */}
-          {el.type === "signature" && (
-            <div
-              className={el.font}
-              style={{
-                color: el.color,
-                fontSize: el.height * 0.6,
-                lineHeight: 1,
-              }}
+    <div className="flex-1 flex flex-col items-center bg-gray-100 min-h-screen">
+  
+      {/* ================= PDF SECTION ONLY ================= */}
+      <div className="w-full flex justify-center">
+  
+        <div className="w-[800px]">
+  
+          {/* Sticky Action Bar (now scoped to PDF section) */}
+          <div className="sticky top-0 z-40 flex justify-end items-center py-3 gap-4 bg-white border-b border-gray-200">
+  
+            <button
+              onClick={handleSave}
+              disabled={loading}
+              className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition disabled:opacity-40"
+              title="Save"
             >
-              {el.value}
-            </div>
-          )}
-      
-          {/* Printed Name */}
-          {el.type === "name" && (
-            <div
-              style={{
-                color: "#000",
-                fontSize: el.height * 0.5,
-                fontWeight: 500,
-              }}
+              <Save size={20} />
+            </button>
+  
+            <button
+              onClick={handleUpload}
+              className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition"
+              title="Upload"
             >
-              {el.value}
-            </div>
-          )}
-      
-          {/* Initials */}
-          {el.type === "initials" && (
-            <div
-              className={el.font}
-              style={{
-                color: el.color,
-                fontSize: el.height * 0.7,
-              }}
+              <CloudUpload size={20} />
+            </button>
+  
+            {signedUrl && (
+              <button
+                onClick={handleCopy}
+                className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition"
+                title="Copy Link"
+              >
+                {copied ? <FiCheck size={20} /> : <FiCopy size={20} />}
+              </button>
+            )}
+  
+            <button
+              onClick={handleDownload}
+              className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition"
+              title="Download"
             >
-              {el.value}
-            </div>
-          )}
-      
-          {/* Stamp */}
-          {el.type === "stamp" && el.value && (
-            <img
-              src={el.value}
-              alt="Stamp"
-              className="w-full h-full object-contain pointer-events-none"
-            />
-          )}
-      
-          {/* Date */}
-          {el.type === "date" && (
-            <div
-              style={{
-                fontSize: el.height * 0.4,
-                color: "#6b21a8",
-              }}
-            >
-              {new Date().toLocaleDateString()}
-            </div>
-          )}
+              <Download size={20} />
+            </button>
+          </div>
+  
+          {/* PDF Container */}
+          <div
+            className=" relative bg-white shadow-xl rounded-xl"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <Document file={url}>
+              <Page pageNumber={1} width={800} />
+            </Document>
+  
+            {/* Render Elements */}
+            {elements.map((el) => (
+              <Rnd
+                key={el.id}
+                onMouseDown={() => setSelectedId(el.id)}
+                size={{
+                  width: el.width ?? 150,
+                  height: el.height ?? 50,
+                }}
+                position={{
+                  x: el.x ?? 0,
+                  y: el.y ?? 0,
+                }}
+                bounds="parent"
+                enableResizing={selectedId === el.id}
+                onDragStop={(e, d) => {
+                  setElements((prev) =>
+                    prev.map((item) =>
+                      item.id === el.id
+                        ? { ...item, x: d.x, y: d.y }
+                        : item
+                    )
+                  );
+                }}
+                onResizeStop={(e, direction, ref, delta, position) => {
+                  setElements((prev) =>
+                    prev.map((item) =>
+                      item.id === el.id
+                        ? {
+                            ...item,
+                            width: ref.offsetWidth,
+                            height: ref.offsetHeight,
+                            x: position.x,
+                            y: position.y,
+                          }
+                        : item
+                    )
+                  );
+                }}
+              >
+                <div
+                  ref={(ref) => (elementRefs.current[el.id] = ref)}
+                  className={`w-full h-full flex items-center justify-center cursor-move
+                  ${selectedId === el.id ? "border-2 border-blue-500 rounded-md" : ""}`}
+                >
+                  {el.type === "signature" && (
+                    <div
+                      className={el.font}
+                      style={{
+                        color: el.color,
+                        fontSize: el.height * 0.6,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {el.value}
+                    </div>
+                  )}
+  
+                  {el.type === "name" && (
+                    <div
+                      style={{
+                        color: "#000",
+                        fontSize: el.height * 0.5,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {el.value}
+                    </div>
+                  )}
+  
+                  {el.type === "initials" && (
+                    <div
+                      className={el.font}
+                      style={{
+                        color: el.color,
+                        fontSize: el.height * 0.7,
+                      }}
+                    >
+                      {el.value}
+                    </div>
+                  )}
+  
+                  {el.type === "stamp" && el.value && (
+                    <img
+                      src={el.value}
+                      alt="Stamp"
+                      className="w-full h-full object-contain pointer-events-none"
+                    />
+                  )}
+  
+                  {el.type === "date" && (
+                    <div
+                      style={{
+                        fontSize: el.height * 0.4,
+                        color: "#000",
+                      }}
+                    >
+                      {new Date().toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+              </Rnd>
+            ))}
+          </div>
         </div>
-      </Rnd>
-      
-       
-        ))}
       </div>
     </div>
   );
