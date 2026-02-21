@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getMyDocuments } from "../api/documents";
+import { Trash2 } from "lucide-react";
+import { getMyDocuments, deleteDocument } from "../api/documents";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -17,7 +18,21 @@ export default function Dashboard() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this document?");
+    if (!confirmDelete) return;
   
+    try {
+      await deleteDocument(id);
+  
+      // Remove from UI
+      setDocs((prev) => prev.filter((doc) => doc.id !== id));
+  
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete document");
+    }
+  };
   // 🔎 Filter documents
   const filteredDocs =
   statusFilter === "all"
@@ -127,13 +142,13 @@ export default function Dashboard() {
                 >
                   Preview
                 </button>
-
-                {/* <button
-                  onClick={() => navigate(`/sign/${doc.id}`)}
-                  className="text-green-600 hover:underline text-sm font-medium"
-                >
-                  Sign
-                </button> */}
+                <button
+  onClick={() => handleDelete(doc.id)}
+  className="text-red-600 hover:text-red-800 transition"
+  title="Delete"
+>
+  <Trash2 size={18} />
+</button>
               </div>
             </div>
           ))}

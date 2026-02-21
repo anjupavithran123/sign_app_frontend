@@ -48,3 +48,18 @@ export const getPreviewUrl = async (docId) => {
 
   return res.data.url;
 };
+
+export const deleteDocument = async (id) => {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.delete(
+    `${API_URL}/api/docs/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data;
+};
