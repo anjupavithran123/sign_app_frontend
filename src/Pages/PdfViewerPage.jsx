@@ -304,108 +304,115 @@ const handleCopy = async () => {
             </Document>
   
             {/* Render Elements */}
-            {elements.map((el) => (
-              <Rnd
-                key={el.id}
-                onMouseDown={() => setSelectedId(el.id)}
-                size={{
-                  width: el.width ?? 150,
-                  height: el.height ?? 50,
-                }}
-                position={{
-                  x: el.x ?? 0,
-                  y: el.y ?? 0,
-                }}
-                bounds="parent"
-                enableResizing={selectedId === el.id}
-                onDragStop={(e, d) => {
-                  setElements((prev) =>
-                    prev.map((item) =>
-                      item.id === el.id
-                        ? { ...item, x: d.x, y: d.y }
-                        : item
-                    )
-                  );
-                }}
-                onResizeStop={(e, direction, ref, delta, position) => {
-                  setElements((prev) =>
-                    prev.map((item) =>
-                      item.id === el.id
-                        ? {
-                            ...item,
-                            width: ref.offsetWidth,
-                            height: ref.offsetHeight,
-                            x: position.x,
-                            y: position.y,
-                          }
-                        : item
-                    )
-                  );
-                }}
-              >
-                <div
-                  ref={(ref) => (elementRefs.current[el.id] = ref)}
-                  className={`w-full h-full flex items-center justify-center cursor-move
-                  ${selectedId === el.id ? "border-2 border-blue-500 rounded-md" : ""}`}
-                >
-                  {el.type === "signature" && (
-                    <div
-                      className={el.font}
-                      style={{
-                        color: el.color,
-                        fontSize: el.height * 0.6,
-                        lineHeight: 1,
-                      }}
-                    >
-                      {el.value}
-                    </div>
-                  )}
-  
-                  {el.type === "name" && (
-                    <div
-                      style={{
-                        color: "#000",
-                        fontSize: el.height * 0.5,
-                        fontWeight: 500,
-                      }}
-                    >
-                      {el.value}
-                    </div>
-                  )}
-  
-                  {el.type === "initials" && (
-                    <div
-                      className={el.font}
-                      style={{
-                        color: el.color,
-                        fontSize: el.height * 0.7,
-                      }}
-                    >
-                      {el.value}
-                    </div>
-                  )}
-  
-                  {el.type === "stamp" && el.value && (
-                    <img
-                      src={el.value}
-                      alt="Stamp"
-                      className="w-full h-full object-contain pointer-events-none"
-                    />
-                  )}
-  
-                  {el.type === "date" && (
-                    <div
-                      style={{
-                        fontSize: el.height * 0.4,
-                        color: "#000",
-                      }}
-                    >
-                      {new Date().toLocaleDateString()}
-                    </div>
-                  )}
-                </div>
-              </Rnd>
-            ))}
+            {elements.map((el, index) => (
+        <Rnd
+        key={el.id}
+        onMouseDown={() => setSelectedId(el.id)}
+        size={{
+          width: el.width ?? 150,
+          height: el.height ?? 50,
+        }}
+        position={{
+          x: el.x ?? 0,
+          y: el.y ?? 0,
+        }}
+        bounds="parent"
+        enableResizing={selectedId === el.id}   // ✅ only resize when selected
+        onDragStop={(e, d) => {
+          setElements((prev) =>
+            prev.map((item) =>
+              item.id === el.id
+                ? { ...item, x: d.x, y: d.y }
+                : item
+            )
+          );
+        }}
+        onResizeStop={(e, direction, ref, delta, position) => {
+          setElements((prev) =>
+            prev.map((item) =>
+              item.id === el.id
+                ? {
+                    ...item,
+                    width: ref.offsetWidth,
+                    height: ref.offsetHeight,
+                    x: position.x,
+                    y: position.y,
+                  }
+                : item
+            )
+          );
+        }}
+      >
+        <div
+          ref={(ref) => (elementRefs.current[el.id] = ref)}
+          className={`w-full h-full flex items-center justify-center cursor-move
+            ${selectedId === el.id ? "border-2 border-blue-500" : ""}`}
+        >
+          {/* Signature */}
+          {el.type === "signature" && (
+            <div
+              className={el.font}
+              style={{
+                color: el.color,
+                fontSize: el.height * 0.6,
+                lineHeight: 1,
+              }}
+            >
+              {el.value}
+            </div>
+          )}
+      
+          {/* Printed Name */}
+          {el.type === "name" && (
+            <div
+              style={{
+                color: "#000",
+                fontSize: el.height * 0.5,
+                fontWeight: 500,
+              }}
+            >
+              {el.value}
+            </div>
+          )}
+      
+          {/* Initials */}
+          {el.type === "initials" && (
+            <div
+              className={el.font}
+              style={{
+                color: el.color,
+                fontSize: el.height * 0.7,
+              }}
+            >
+              {el.value}
+            </div>
+          )}
+      
+          {/* Stamp */}
+          {el.type === "stamp" && el.value && (
+            <img
+              src={el.value}
+              alt="Stamp"
+              className="w-full h-full object-contain pointer-events-none"
+            />
+          )}
+      
+          {/* Date */}
+          {el.type === "date" && (
+            <div
+              style={{
+                fontSize: el.height * 0.4,
+                color: "#00000",
+              }}
+            >
+              {new Date().toLocaleDateString()}
+            </div>
+          )}
+        </div>
+      </Rnd>
+      
+       
+        ))}
           </div>
         </div>
       </div>
