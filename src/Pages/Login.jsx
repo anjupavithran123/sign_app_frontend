@@ -13,20 +13,22 @@ export default function Login() {
   // ✅ Get `next` from query params, default to dashboard
   const params = new URLSearchParams(location.search);
   const next = params.get("next") || "/dashboard";
-
+  const [loading, setLoading] = useState(false);
   const submit = async (e) => {
     e.preventDefault();
+    setLoading(true);       // 🔵 Start loading
+    setError("");
+  
     try {
       const data = await loginUser(form);
       login(data);
-
-      // ✅ Navigate to `next` after successful login
       navigate(next, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);    // 🔵 Stop loading
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-800 to-purple-800 px-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
@@ -78,11 +80,15 @@ export default function Login() {
           </div>
 
           <button
-            type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-semibold transition duration-200 shadow-md hover:shadow-lg"
-          >
-            Login
-          </button>
+  type="submit"
+  disabled={loading}
+  className={`w-full py-2.5 rounded-lg font-semibold transition duration-200 shadow-md
+  ${loading 
+    ? "bg-indigo-400 cursor-not-allowed" 
+    : "bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg text-white"}`}
+>
+  {loading ? "Logging..." : "Login"}
+</button>
         </form>
 
         {/* Footer */}

@@ -7,7 +7,8 @@ import { PDFDocument } from "pdf-lib";
 import { toPng } from "html-to-image";
 import { FiCopy, FiCheck } from "react-icons/fi";
 
-
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { getPreviewUrl } from "../api/documents";
 import { saveElements, getSignaturesByFile ,uploadSignedPDF} from "../api/signature";
 
@@ -15,6 +16,8 @@ pdfjs.GlobalWorkerOptions.workerSrc =
   `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function PdfViewerPage() {
+
+  const navigate = useNavigate();
   const { dragItem, setDragItem, user } = useOutletContext();
   const { id } = useParams();
   const [selectedId, setSelectedId] = useState(null);
@@ -245,7 +248,15 @@ const handleCopy = async () => {
   
           {/* Sticky Action Bar (now scoped to PDF section) */}
           <div className="sticky top-0 z-40 flex justify-end items-center py-3 gap-4 bg-white border-b border-gray-200">
-  
+          <div className="w-full flex items-center py-4 pl-4">
+  <button
+    onClick={() => navigate("/dashboard")}
+    className="flex items-center gap-2 text-gray-700 hover:text-black font-medium transition"
+  >
+    <ArrowLeft size={20} />
+    
+  </button>
+</div>
             <button
               onClick={handleSave}
               disabled={loading}
