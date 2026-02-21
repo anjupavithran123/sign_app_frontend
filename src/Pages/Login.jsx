@@ -2,7 +2,7 @@ import { useState } from "react";
 import { loginUser } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-
+import { ArrowLeft } from "lucide-react";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -31,6 +31,14 @@ export default function Login() {
   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-800 to-purple-800 px-4">
+      
+      {/* Back to Home Button */}
+<button
+  onClick={() => navigate("/")}
+  className="absolute top-6 left-6 flex items-center gap-2 text-white hover:text-gray-200 transition"
+>
+  <ArrowLeft size={22} />
+</button>
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
         {/* Header */}
         <div className="text-center mb-6">

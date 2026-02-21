@@ -19,7 +19,7 @@ export default function TopBar() {
           onClick={() => navigate("/dashboard")}
           className="text-2xl font-extrabold tracking-tight text-indigo-600 cursor-pointer hover:opacity-80 transition"
         >
-          eSign
+          eSignPro
         </div>
   
         {/* Right */}
